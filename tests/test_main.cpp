@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "scalar.h"
+#include "../scalar.h"
 
 
 TEST(ScalarTest, Test1) {

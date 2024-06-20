@@ -1,0 +1,37 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up C++ environment
+        uses: actions/setup-cpp@v1
+        with:
+          cpp-version: '17'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtest-dev
+          sudo apt-get install -y cmake
+          cd /usr/src/gtest
+          sudo cmake CMakeLists.txt
+          sudo make
+          sudo cp *.a /usr/lib
+
+      - name: Build and run tests
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make
+          ./tests/test_main
