@@ -1,4 +1,5 @@
 # Backprop
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <p align="center">
     <img src="static/cartoon.webp" alt="Image" width="512" height="512">
 </p>
