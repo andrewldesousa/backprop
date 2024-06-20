@@ -40,7 +40,6 @@ TEST(ScalarTest, Test2) {
     EXPECT_DOUBLE_EQ(s3.grad, 3.0);
     EXPECT_DOUBLE_EQ(s4.grad, -10);
     EXPECT_DOUBLE_EQ(s5.grad, -5);
-
 }
 
 int main(int argc, char **argv) {
