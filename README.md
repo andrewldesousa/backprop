@@ -1,5 +1,8 @@
 # Backprop
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Unit Tests](https://github.com/andrewldesousa/backprop.cpp/actions/workflows/unit_tests.yaml/badge.svg)
+
+
 <p align="center">
     <img src="static/cartoon.webp" alt="Image" width="512" height="512">
 </p>
