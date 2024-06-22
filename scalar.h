@@ -5,7 +5,7 @@
 
 
 template <typename T>
-class Scalar {
+class Scalar: public std::enable_shared_from_this<Scalar<T>> {
 public:
     T value;
     T grad = 0;
@@ -18,170 +18,101 @@ public:
         _backward = []() {};
     }
 
-    void backward() {
+    void backward(bool is_root=true) {
         // if in_degrees is not zero, return
         if (in_degrees != 0) { throw std::runtime_error("in_degrees is not zero"); }
+        if (is_root) { this->grad = 1.0; }
+        
         _backward();
 
         // backward children
         for (auto child : children) {
             child->in_degrees--;
-            if (child->in_degrees == 0) { child->backward(); }
+            if (child->in_degrees == 0) { child->backward(false); }
         }
     }
 
-    Scalar<T>& operator+(Scalar<T>& other) {
-        auto result = std::make_shared<Scalar<T>>(this->value + other.value);
+    friend std::shared_ptr<Scalar<T>> operator+(std::shared_ptr<Scalar<T>> lhs, std::shared_ptr<Scalar<T>> rhs) {
+        auto result = std::make_shared<Scalar<T>>(lhs->value + rhs->value);
         
-        auto other_shared_ptr = std::shared_ptr<Scalar<T>>(&other);
-        auto this_shared_ptr = std::shared_ptr<Scalar<T>>(this);
-        result->children.insert(this_shared_ptr);
-        result->children.insert(other_shared_ptr);
-        this->in_degrees++;
-        other.in_degrees++;
+        result->children.insert(lhs);
+        result->children.insert(rhs);
+        lhs->in_degrees++;
+        rhs->in_degrees++;
 
         result->_backward = [&, result]() {
-            this->grad += 1.0 * result->grad;
-            other.grad += 1.0 * result->grad;
+            lhs->grad += 1.0 * result->grad;
+            rhs->grad += 1.0 * result->grad;
         };
 
-        return *result;
+        return result;
     }
 
-    Scalar<T>& operator-(Scalar<T>& other) {
-        auto result = std::make_shared<Scalar<T>>(this->value - other.value);
-        
-        auto other_shared_ptr = std::shared_ptr<Scalar<T>>(&other);
-        auto this_shared_ptr = std::shared_ptr<Scalar<T>>(this);
-        result->children.insert(this_shared_ptr);
-        result->children.insert(other_shared_ptr);
+    friend std::shared_ptr<Scalar<T>> operator-(std::shared_ptr<Scalar<T>> lhs, std::shared_ptr<Scalar<T>> rhs) {
+        auto result = std::make_shared<Scalar<T>>(lhs->value - rhs->value);
 
-        this->in_degrees++;
-        other.in_degrees++;
+        result->children.insert(lhs);
+        result->children.insert(rhs);
+        lhs->in_degrees++;
+        rhs->in_degrees++;
 
         result->_backward = [&, result]() {
-            this->grad += 1.0 * result->grad;
-            other.grad -= 1.0 * result->grad;
+            lhs->grad += 1.0 * result->grad;
+            rhs->grad += -1.0 * result->grad;
         };
 
-        return *result;
+        return result;
     }
 
-    Scalar<T>& operator*(Scalar<T>& other) {
-        auto result = std::make_shared<Scalar<T>>(this->value * other.value);
-        
-        auto other_shared_ptr = std::shared_ptr<Scalar<T>>(&other);
-        auto this_shared_ptr = std::shared_ptr<Scalar<T>>(this);
-        result->children.insert(this_shared_ptr);
-        result->children.insert(other_shared_ptr);
+    friend std::shared_ptr<Scalar<T>> operator*(std::shared_ptr<Scalar<T>> lhs, std::shared_ptr<Scalar<T>> rhs) {
+        auto result = std::make_shared<Scalar<T>>(lhs->value * rhs->value);
 
-        this->in_degrees++;
-        other.in_degrees++;
+        result->children.insert(lhs);
+        result->children.insert(rhs);
+        lhs->in_degrees++;
+        rhs->in_degrees++;
 
         result->_backward = [&, result]() {
-            this->grad += other.value * result->grad;
-            other.grad += this->value * result->grad;
+            lhs->grad += rhs->value * result->grad;
+            rhs->grad += lhs->value * result->grad;
         };
 
-        return *result;
+        return result;
     }
 
-    Scalar<T>& operator/(Scalar<T>& other) {
-        auto result = std::make_shared<Scalar<T>>(this->value / other.value);
+    friend std::shared_ptr<Scalar<T>> operator/(std::shared_ptr<Scalar<T>> lhs, std::shared_ptr<Scalar<T>> rhs) {
+        auto result = std::make_shared<Scalar<T>>(lhs->value / rhs->value);
 
-        auto other_shared_ptr = std::shared_ptr<Scalar<T>>(&other);
-        auto this_shared_ptr = std::shared_ptr<Scalar<T>>(this);
-        result->children.insert(this_shared_ptr);
-        result->children.insert(other_shared_ptr);
-
-        this->in_degrees++;
-        other.in_degrees++;
+        result->children.insert(lhs);
+        result->children.insert(rhs);
+        lhs->in_degrees++;
+        rhs->in_degrees++;
 
         result->_backward = [&, result]() {
-            this->grad += 1.0 / other.value * result->grad;
-            other.grad -= this->value / (other.value * other.value) * result->grad;
+            lhs->grad += 1.0 / rhs->value * result->grad;
+            rhs->grad += -lhs->value / (rhs->value * rhs->value) * result->grad;
         };
 
-        return *result;
+        return result;
     }
+
+    // // unary operators
+    // std::shared_ptr<Scalar<T>> operator-() {
+    //     auto result = std::make_shared<Scalar<T>>(-this->value);
+    //     auto this_shared_ptr = std::shared_ptr<Scalar<T>>(this);
+    //     result->children.insert(this_shared_ptr);
+    //     this->in_degrees++;
+
+    //     result->_backward = [&, result]() {
+    //         this->grad += -1.0 * result->grad;
+    //     };
+
+    //     return *result;
+    // }
+
+    // // += operator
+    // std::shared_ptr<Scalar<T>> operator+=(std::shared_ptr<Scalar<T>> other) {
+    //     *this = *this + other;
+    //     return *this;
+    // }
 };
-
-
-// numerical and scalar overload operators
-template <typename T>
-Scalar<T>& operator+(Scalar<T>& s1, T s2) {
-    auto result = std::make_shared<Scalar<T>>(s1.value + s2);
-    auto s1_shared_ptr = std::shared_ptr<Scalar<T>>(&s1);
-    result->children.insert(s1_shared_ptr);
-    s1.in_degrees++;
-
-    result->_backward = [&, result]() {
-        s1.grad += 1.0 * result->grad;
-    };
-
-    return *result;
-}
-
-// other order
-template <typename T>
-Scalar<T>& operator+(T s1, Scalar<T>& s2) {
-    return s2 + s1;
-}
-
-template <typename T>
-Scalar<T>& operator-(Scalar<T>& s1, T s2) {
-    auto result = std::make_shared<Scalar<T>>(s1.value - s2);
-    auto s1_shared_ptr = std::shared_ptr<Scalar<T>>(&s1);
-    result->children.insert(s1_shared_ptr);
-    s1.in_degrees++;
-
-    result->_backward = [&, result]() {
-        s1.grad += 1.0 * result->grad;
-    };
-
-    return *result;
-}
-
-// other order
-template <typename T>
-Scalar<T>& operator-(T s1, Scalar<T>& s2) {
-    return s2 - s1;
-}
-
-template <typename T>
-Scalar<T>& operator*(Scalar<T>& s1, T s2) {
-    auto result = std::make_shared<Scalar<T>>(s1.value * s2);
-    auto s1_shared_ptr = std::shared_ptr<Scalar<T>>(&s1);
-    result->children.insert(s1_shared_ptr);
-    s1.in_degrees++;
-
-    result->_backward = [&, result]() {
-        s1.grad += s2 * result->grad;
-    };
-
-    return *result;
-}
-
-template <typename T>
-Scalar<T>& operator*(T s1, Scalar<T>& s2) {
-    return s2 * s1;
-}
-
-template <typename T>
-Scalar<T>& operator/(Scalar<T>& s1, T s2) {
-    auto result = std::make_shared<Scalar<T>>(s1.value / s2);
-    auto s1_shared_ptr = std::shared_ptr<Scalar<T>>(&s1);
-    result->children.insert(s1_shared_ptr);
-    s1.in_degrees++;
-
-    result->_backward = [&, result]() {
-        s1.grad += 1.0 / s2 * result->grad;
-    };
-
-    return *result;
-}
-
-template <typename T>
-Scalar<T>& operator/(T s1, Scalar<T>& s2) {
-    return s2 / s1;
-}
