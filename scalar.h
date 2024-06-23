@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <set>
 #include <functional>
@@ -97,22 +99,48 @@ public:
     }
 
     // // unary operators
-    // std::shared_ptr<Scalar<T>> operator-() {
-    //     auto result = std::make_shared<Scalar<T>>(-this->value);
-    //     auto this_shared_ptr = std::shared_ptr<Scalar<T>>(this);
-    //     result->children.insert(this_shared_ptr);
-    //     this->in_degrees++;
+    friend std::shared_ptr<Scalar<T>> operator+(std::shared_ptr<Scalar<T>> rhs) {
+        return rhs;
+    }
 
-    //     result->_backward = [&, result]() {
-    //         this->grad += -1.0 * result->grad;
-    //     };
+    friend std::shared_ptr<Scalar<T>> operator-(std::shared_ptr<Scalar<T>> rhs) {
+        auto result = std::make_shared<Scalar<T>>(-rhs->value);
 
-    //     return *result;
-    // }
+        result->children.insert(rhs);
+        rhs->in_degrees++;
 
-    // // += operator
-    // std::shared_ptr<Scalar<T>> operator+=(std::shared_ptr<Scalar<T>> other) {
-    //     *this = *this + other;
-    //     return *this;
-    // }
+        result->_backward = [&, result]() {
+            rhs->grad += -1.0 * result->grad;
+        };
+
+        return result;
+    }
+
+    // exp
+    friend std::shared_ptr<Scalar<T>> exp(std::shared_ptr<Scalar<T>> rhs) {
+        auto result = std::make_shared<Scalar<T>>(std::exp(rhs->value));
+
+        result->children.insert(rhs);
+        rhs->in_degrees++;
+
+        result->_backward = [&, result]() {
+            rhs->grad += std::exp(rhs->value) * result->grad;
+        };
+
+        return result;
+    }
+
+    // log
+    friend std::shared_ptr<Scalar<T>> log(std::shared_ptr<Scalar<T>> rhs) {
+        auto result = std::make_shared<Scalar<T>>(std::log(rhs->value));
+
+        result->children.insert(rhs);
+        rhs->in_degrees++;
+
+        result->_backward = [&, result]() {
+            rhs->grad += 1.0 / rhs->value * result->grad;
+        };
+
+        return result;
+    }
 };
