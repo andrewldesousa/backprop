@@ -28,13 +28,17 @@ public:
         return instance;
     }
 
-    void backward() {
-        for (auto node : nodes) { if (node->in_degrees == 0) { node->backward(); } }
-    }
-
     void add_node(std::shared_ptr<Scalar<T>> node) { nodes.insert(node); }
 
-    void clear() { nodes.clear(); }
+    void clear() { 
+        for (auto node : nodes) {
+            node->grad = 0;
+            node->in_degrees = 0;
+            node->children.clear();
+        }
+
+        nodes.clear(); 
+    }
 };
 
 
