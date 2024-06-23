@@ -80,6 +80,9 @@
         "utility": "cpp",
         "__memory": "cpp",
         "chrono": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "print": "cpp",
+        "bit": "cpp",
+        "random": "cpp"
     }
 }

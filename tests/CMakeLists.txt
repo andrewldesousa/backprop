@@ -4,6 +4,7 @@ find_package(GTest REQUIRED)
 add_executable(
   test_main
   test_main.cpp
+  test_functions.cpp
 )
 
 target_link_libraries(

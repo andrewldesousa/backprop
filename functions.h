@@ -5,10 +5,10 @@
 
 // ce loss function leveraging shared
 template <typename T>
-std::shared_ptr<Scalar<T>> ce(std::shared_ptr<Scalar<T>> y, std::shared_ptr<Scalar<T>> y_hat) {
+std::shared_ptr<Scalar<T>> cross_entropy(std::shared_ptr<Scalar<T>> y, std::shared_ptr<Scalar<T>> y_hat) {
     if (y->value == 1) { return -log(y_hat); }
     else {
-        auto one = std::make_shared<Scalar<T>>(1);
+        auto one = Scalar<T>::make(1);
         return -log(one - y_hat);
     }
 }
@@ -16,13 +16,13 @@ std::shared_ptr<Scalar<T>> ce(std::shared_ptr<Scalar<T>> y, std::shared_ptr<Scal
 // sigmoid function leveraging shared
 template <typename T>
 std::shared_ptr<Scalar<T>> sigmoid(std::shared_ptr<Scalar<T>> x) {
-    auto numerator = std::make_shared<Scalar<T>>(1);
-    auto denominator = std::make_shared<Scalar<T>>(1) + exp(-x);
+    auto negative_x = -x;
+    auto exp_negative_x = exp(negative_x);    
+    auto numerator = Scalar<T>::make(1);
+    
+    auto denominator_one = Scalar<T>::make(1);
+    auto denominator = denominator_one + exp_negative_x;
+    auto result = numerator / denominator;
 
-    // print numerator and denominator
-    std::cout << "Numerator: " << numerator->value << std::endl;
-    std::cout << "Denominator: " << denominator->value << std::endl;
-
-
-    return numerator / denominator;
+    return result;
 }

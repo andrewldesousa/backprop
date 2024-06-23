@@ -6,31 +6,30 @@
 int main() {
     // 4x2 dataset maxtrix shared pointer
     std::shared_ptr<Scalar<double>> X[4][2];
-    X[0][0] = std::make_shared<Scalar<double>>(0);
-    X[0][1] = std::make_shared<Scalar<double>>(0);
-    X[1][0] = std::make_shared<Scalar<double>>(0);
-    X[1][1] = std::make_shared<Scalar<double>>(1);
-    X[2][0] = std::make_shared<Scalar<double>>(1);
-    X[2][1] = std::make_shared<Scalar<double>>(0);
-    X[3][0] = std::make_shared<Scalar<double>>(1);
-    X[3][1] = std::make_shared<Scalar<double>>(1);
+    X[0][0] = Scalar<double>::make(0);
+    X[0][1] = Scalar<double>::make(0);
+    X[1][0] = Scalar<double>::make(0);
+    X[1][1] = Scalar<double>::make(1);
+    X[2][0] = Scalar<double>::make(1);
+    X[2][1] = Scalar<double>::make(0);
+    X[3][0] = Scalar<double>::make(1);
+    X[3][1] = Scalar<double>::make(1);
 
     // labels shared pointer
     std::shared_ptr<Scalar<double>> Y[4];
-    Y[0] = std::make_shared<Scalar<double>>(0);
-    Y[1] = std::make_shared<Scalar<double>>(0);
-    Y[2] = std::make_shared<Scalar<double>>(0);
-    Y[3] = std::make_shared<Scalar<double>>(1);
+    Y[0] = Scalar<double>::make(0);
+    Y[1] = Scalar<double>::make(0);
+    Y[2] = Scalar<double>::make(0);
+    Y[3] = Scalar<double>::make(1);
 
     // weights shared pointer
-    std::shared_ptr<Scalar<double>> w1 = std::make_shared<Scalar<double>>(-.09);
-    std::shared_ptr<Scalar<double>> w2 = std::make_shared<Scalar<double>>(.02);
-    std::shared_ptr<Scalar<double>> b = std::make_shared<Scalar<double>>(0);
+    std::shared_ptr<Scalar<double>> w1 = Scalar<double>::make(-.09);
+    std::shared_ptr<Scalar<double>> w2 = Scalar<double>::make(.02);
+    std::shared_ptr<Scalar<double>> b = Scalar<double>::make(0);
     int num_epochs = 10000, num_samples = 4;
     float learning_rate = 0.001;
 
     for (int i = 0; i < num_epochs; i++) {
-        // loss
         std::shared_ptr<Scalar<double>> loss = std::make_shared<Scalar<double>>(0);
 
         for (int j = 0; j < num_samples; j++) {
