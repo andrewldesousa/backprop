@@ -48,9 +48,7 @@ int main() {
         b->value = b->value - learning_rate * b->grad;
 
         // print epoch loss
-        if (i % 1000 == 0) {
-            std::cout << "Epoch: " << i << " Loss: " << loss->value << std::endl;
-        }
+        if (i % 1000 == 0) std::cout << "Epoch: " << i << " Loss: " << loss->value << std::endl;
     }
 
     return 0;

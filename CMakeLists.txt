@@ -15,4 +15,3 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(tests)
 
 add_executable(and_example apps/and.cpp)
-add_executable(linear apps/linear.cpp)
