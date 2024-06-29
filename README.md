@@ -15,6 +15,16 @@ Then include the header file in your source file.
 #include "backprop.h"
 ```
 
+## Binary Classification Example
+The following example demonstrates how to train a model to classify a binary dataset.
+```bash
+mkdir build
+cd build
+cmake ..
+make
+./and_example
+```
+
 ## Tests
 ```bash
 mkdir build

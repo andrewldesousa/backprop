@@ -39,6 +39,18 @@ TEST(ScalarMultiplication, Test1) {
     EXPECT_FLOAT_EQ(s2->grad, 1.0);
 }
 
+TEST(ScalarMultiplication, Test2) {
+    // multiply by itself
+    auto s1 = Scalar<float>::make(2.0);
+
+    auto s2 = s1 * s1;
+
+    EXPECT_FLOAT_EQ(s2->value, 4.0);
+
+    s2->backward();
+    EXPECT_FLOAT_EQ(s1->grad, 4.0);
+}
+
 TEST(ScalarDivision, Test1) {
     auto s1 = Scalar<float>::make(1.0);
     auto s2 = Scalar<float>::make(2.0);
@@ -241,6 +253,23 @@ TEST(ScalarLog, Test3) {
 
     s2->backward();
     EXPECT_FLOAT_EQ(s1->grad, 0.1);
+}
+
+TEST(MSEExample, Test1) {
+    auto y = Scalar<float>::make(1);
+    auto y_hat = Scalar<float>::make(2);
+
+    auto diff = y - y_hat;
+    auto diff_squared = square(diff);
+    auto two = Scalar<float>::make(2);
+
+    auto loss = diff_squared / two;
+
+    loss->backward();
+
+    // yhat grad
+    EXPECT_FLOAT_EQ(y_hat->grad, 1.0);
+
 }
 
 int main(int argc, char **argv) {

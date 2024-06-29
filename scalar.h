@@ -60,7 +60,6 @@ public:
     static std::shared_ptr<Scalar<T>> make(T value) {
         auto s = std::make_shared<Scalar<T>>(value);
         ComputationalGraph<T>::get_instance().add_node(s);
-        
         return s;
     }
 
@@ -82,6 +81,7 @@ public:
         auto result = Scalar<T>::make(
             lhs->value + rhs->value
         );
+        
         result->children.insert(lhs);
         result->children.insert(rhs);
 
@@ -189,4 +189,26 @@ public:
 
         return result;
     }
+
+    // square operator
+    friend std::shared_ptr<Scalar<T>> square(std::shared_ptr<Scalar<T>> rhs) {
+        auto result = Scalar<T>::make(rhs->value * rhs->value);
+
+        result->children.insert(rhs);
+        rhs->in_degrees++;
+
+        result->_backward = [rhs, result]() {
+            rhs->grad += 2.0 * rhs->value * result->grad;
+        };
+
+        return result;
+    }
+
+
+    // dont allow inplace operations
+    Scalar<T>& operator+=(const Scalar<T>& rhs) = delete;
+    Scalar<T>& operator-=(const Scalar<T>& rhs) = delete;
+    Scalar<T>& operator*=(const Scalar<T>& rhs) = delete;
+    Scalar<T>& operator/=(const Scalar<T>& rhs) = delete;
+
 };
