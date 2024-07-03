@@ -10,65 +10,6 @@
 
 static int id_counter;
 
-// forward declaration
-template <typename T>
-class Scalar;
-
-template <typename T>
-class ComputationalGraph {
-    // Make the constructor private to enforce singleton pattern
-    ComputationalGraph() {}
-
-public:
-    std::set<std::shared_ptr<Scalar<T>>> nodes;
-    std::shared_ptr<Scalar<T>> root;
-
-    ComputationalGraph(const ComputationalGraph&) = delete;
-    ComputationalGraph& operator=(const ComputationalGraph&) = delete;
-
-    // Static method to access the singleton instance
-    static ComputationalGraph<T>& get_instance() {
-        static ComputationalGraph<T> instance;
-        return instance;
-    }
-
-    void add_node(std::shared_ptr<Scalar<T>> node) { nodes.insert(node); }
-
-    void clear() { 
-        for (auto node : nodes) {
-            node->grad = 0;
-            node->in_degrees = 0;
-            node->children.clear();
-        }
-
-        nodes.clear(); 
-        root = NULL;
-    }
-
-    void write_dot(std::string& filename) {
-        // create subdirs from filename
-        std::filesystem::create_directories(std::filesystem::path(filename).parent_path());
-        std::ofstream file;
-        
-        file.open(filename);
-        if (!file.is_open()) 
-            throw std::runtime_error("Could not open file: " + filename);
-
-        file << "digraph G {\n";
-        for (auto node : nodes) file << "  " << node.get()->to_string() << "\n";
-
-        for (auto node : nodes) 
-            for (auto child : node->children) 
-                file << "  node" << node->id << " -> node" << child->id << "\n";
-
-        file << "}\n";
-        file.close();
-
-        if (Logger::get_instance().debug_mode) 
-            Logger::get_instance().log("Wrote graph to file: " + filename);
-    }
-};
-
 template <typename T>
 class Scalar: public std::enable_shared_from_this<Scalar<T>> {
     
@@ -90,7 +31,6 @@ public:
 
     static std::shared_ptr<Scalar<T>> make(T value) {
         auto s = std::make_shared<Scalar<T>>(value);
-        ComputationalGraph<T>::get_instance().add_node(s);
         return s;
     }
 
@@ -249,3 +189,37 @@ public:
         return node_str;
     }
 };
+
+// visualize the graph
+template <typename T>
+void write_dot(std::string filename, std::shared_ptr<Scalar<T>> root) {
+    if (root == NULL) throw std::runtime_error("Root is NULL");
+
+    std::ofstream file;
+    file.open(filename);
+
+    if (!file.is_open()) 
+        throw std::runtime_error("Could not open file: " + filename);
+
+    file << "digraph G {\n";
+    std::function<void(std::shared_ptr<Scalar<T>>, std::set<std::shared_ptr<Scalar<T>>>&)> dfs = 
+        [&](std::shared_ptr<Scalar<T>> node, std::set<std::shared_ptr<Scalar<T>>>& visited) {
+            if (!node || visited.find(node) != visited.end()) return; // Base case: node is null or already visited
+
+            file << "  " << node->to_string() << "\n"; // Write the node to the file
+
+            visited.insert(node); // Mark the node as visited
+            for (auto& child : node->children) {
+                file << "  node" << node->id << " -> node" << child->id << "\n"; // Write the edge to the file
+                dfs(child, visited); // Recursively visit children
+            }
+        };
+
+    std::set<std::shared_ptr<Scalar<T>>> visited;
+    dfs(root, visited);
+    file << "}\n";
+    file.close();
+
+    if (Logger::get_instance().debug_mode) 
+        Logger::get_instance().log("Wrote graph to file: " + filename);
+}

@@ -49,7 +49,3 @@ public:
         std::cout << colorCode << message << resetColor << std::endl;
     }
 };
-
-void write_graph_to_dot(std::string& filepath, std::shared_ptr<Scalar<double>> loss) {
-    throw std::runtime_error("Not implemented");
-}

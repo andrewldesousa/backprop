@@ -273,9 +273,6 @@ TEST(MSEExample, Test1) {
 }
 
 TEST(GraphVisualization, Test1) {
-    auto& graph = ComputationalGraph<double>::get_instance();
-    graph.clear();
-
     auto w = Scalar<double>::make(-0.1);
 
     auto x = std::vector<std::shared_ptr<Scalar<double>>>{
@@ -304,7 +301,7 @@ TEST(GraphVisualization, Test1) {
 
     // visualize graph
     std::string filepath = "./test_graph.dot";
-    graph.write_dot(filepath);
+    write_dot(filepath, loss);
 
     EXPECT_FLOAT_EQ(w->grad, -0.33);
     
