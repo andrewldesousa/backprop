@@ -33,3 +33,14 @@ cmake ..
 make
 ./tests/test_main
 ```
+
+## Visualization of the Computational Graph
+The computational graph can be visualized using the `write_dot` function, e.g.
+```cpp
+write_dot("graph.dot", loss);
+```
+Using a linear regression example, this is the graph generated:
+
+<div align="center">
+    <img src="./assets/graphviz.png" alt="Linear Regression Graph" width="512" height="512">
+</div>
