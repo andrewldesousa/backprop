@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "../scalar.h"
+#include "../functions.h"
 
 
 TEST(ScalarAddition, Test1) {
@@ -267,9 +268,49 @@ TEST(MSEExample, Test1) {
 
     loss->backward();
 
-    // yhat grad
+    // y_hat grad
     EXPECT_FLOAT_EQ(y_hat->grad, 1.0);
+}
 
+TEST(GraphVisualization, Test1) {
+    auto& graph = ComputationalGraph<double>::get_instance();
+    graph.clear();
+
+    auto w = Scalar<double>::make(-0.1);
+
+    auto x = std::vector<std::shared_ptr<Scalar<double>>>{
+        Scalar<double>::make(.4),
+        Scalar<double>::make(.5),
+        Scalar<double>::make(-.2),
+    };
+
+    auto y = std::vector<std::shared_ptr<Scalar<double>>>{
+        Scalar<double>::make(.4),
+        Scalar<double>::make(.5),
+        Scalar<double>::make(-.2),
+    };
+
+    // make loss 0
+    int num_examples = 0;
+    auto loss = Scalar<double>::make(0.0);
+    for (int i = 0; i < y.size(); i++) {
+        auto y_hat = w * x[i];
+        loss = loss + mse(y[i], y_hat);
+        num_examples++;
+    }
+
+    loss = loss / Scalar<double>::make(num_examples);
+    loss->backward();
+
+    // visualize graph
+    std::string filepath = "./test_graph.dot";
+    graph.write_dot(filepath);
+
+    EXPECT_FLOAT_EQ(w->grad, -0.33);
+    
+    // loss
+    EXPECT_FLOAT_EQ(loss->value, 0.181500);
+    EXPECT_FLOAT_EQ(loss->grad, 1.0);
 }
 
 int main(int argc, char **argv) {

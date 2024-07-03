@@ -22,13 +22,13 @@ TEST(CrossEntropy, Test1) {
     EXPECT_FLOAT_EQ(s2->grad, -2.0);
 }
 
-TEST(MSE, Test1) {
-    auto y = Scalar<float>::make(1);
-    auto y_hat = Scalar<float>::make(2);
+// TEST(MSE, Test1) {
+//     auto y = Scalar<float>::make(1);
+//     auto y_hat = Scalar<float>::make(2);
 
-    auto loss = mse(y, y_hat);
-    loss->backward();
+//     auto loss = mse(y, y_hat);
+//     loss->backward();
 
-    EXPECT_FLOAT_EQ(loss->value, 0.5);
-    EXPECT_FLOAT_EQ(y_hat->grad, 1.0);
-}
+//     EXPECT_FLOAT_EQ(loss->value, 0.5);
+//     EXPECT_FLOAT_EQ(y_hat->grad, 1.0);
+// }

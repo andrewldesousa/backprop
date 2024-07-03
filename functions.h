@@ -31,7 +31,5 @@ template <typename T>
 std::shared_ptr<Scalar<T>> mse(std::shared_ptr<Scalar<T>> y, std::shared_ptr<Scalar<T>> y_hat) {
     auto diff = y - y_hat;
     auto diff_squared = square(diff);
-    auto two = Scalar<T>::make(2);
-    auto result = diff_squared / two;
-    return result;
+    return diff_squared;
 }

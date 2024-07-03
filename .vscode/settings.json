@@ -83,6 +83,13 @@
         "format": "cpp",
         "print": "cpp",
         "bit": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "cinttypes": "cpp",
+        "csignal": "cpp",
+        "forward_list": "cpp",
+        "future": "cpp",
+        "regex": "cpp",
+        "typeindex": "cpp",
+        "valarray": "cpp"
     }
 }
