@@ -132,13 +132,13 @@ public:
     }
 
     friend std::shared_ptr<Scalar<T>> exp(std::shared_ptr<Scalar<T>> rhs) {
-        auto result = Scalar<T>::make(std::exp(rhs->value));
+        auto result = Scalar<T>::make(exp(rhs->value));
 
         result->children.insert(rhs);
         rhs->in_degrees++;
 
         result->_backward = [rhs, result]() {
-            rhs->grad += std::exp(rhs->value) * result->grad;
+            rhs->grad += exp(rhs->value) * result->grad;
         };
 
         return result;
@@ -146,7 +146,7 @@ public:
 
     // log
     friend std::shared_ptr<Scalar<T>> log(std::shared_ptr<Scalar<T>> rhs) {
-        auto result = Scalar<T>::make(std::log(rhs->value));
+        auto result = Scalar<T>::make(log(rhs->value));
 
         result->children.insert(rhs);
         rhs->in_degrees++;
