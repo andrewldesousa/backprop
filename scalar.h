@@ -7,6 +7,7 @@
 #include <fstream>
 #include <filesystem>
 #include "utils.h"
+#include <cmath>
 
 static int id_counter;
 
@@ -146,7 +147,7 @@ public:
 
     // log
     friend std::shared_ptr<Scalar<T>> log(std::shared_ptr<Scalar<T>> rhs) {
-        auto result = Scalar<T>::make(std::log(rhs->value));
+        auto result = Scalar<T>::make(log(rhs->value));
 
         result->children.insert(rhs);
         rhs->in_degrees++;

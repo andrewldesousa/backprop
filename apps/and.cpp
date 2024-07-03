@@ -6,12 +6,15 @@
 // move operator
 #include <utility>
 
+// include exp
+#include <cmath>
+
 
 int main(int argc, char** argv) {
     if (argc > 1 && std::string(argv[1]) == "debug") Logger::get_instance().set_debug_mode(true);
     else if (argc > 1) throw std::runtime_error("Invalid argument in main function. Use 'debug' to enable debug mode.");
 
-    int num_epochs = 50000, num_samples = 4;
+    int num_epochs = 5000000, num_samples = 4;
     float learning_rate = 0.001;
 
     // weights shared pointer
@@ -41,18 +44,13 @@ int main(int argc, char** argv) {
     for (int i = 0; i < num_epochs; i++) {        
         std::shared_ptr<Scalar<double>> loss = Scalar<double>::make(0);
         for (int j = 0; j < num_samples; j++) {
-            auto z = Scalar<double>::make(0);
-            
-            for (int k = 0; k < weights.size(); k++) {
-                if (k == weights.size() - 1) z = z + weights[k];
-                else z = z + weights[k] * X[j][k];
-            }
+            auto z = weights[0] * X[j][0] + weights[1] * X[j][1] + weights[2]; 
             auto a = sigmoid(z);
-            loss = cross_entropy(Y[j], a) + loss;
+            // loss = cross_entropy(Y[j], a) + loss;
         }
 
-        loss = loss / Scalar<double>::make(num_samples);
-        loss->backward();
+        // loss = loss / Scalar<double>::make(num_samples);
+        // loss->backward();
         
         // update weights
         for (int j = 0; j < weights.size(); j++) {

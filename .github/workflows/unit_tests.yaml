@@ -12,13 +12,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
       - name: Install compiler
         id: install_cc
         uses: rlalik/setup-cpp-compiler@master
         with:
           compiler: latest
-
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -26,11 +24,10 @@ jobs:
           sudo apt-get install -y cmake
           # Install Google Test
           sudo apt-get install -y libgtest-dev
-
-      # - name: Build and run tests
-      #   run: |
-      #     mkdir build
-      #     cd build
-      #     cmake ..
-      #     make
-      #     ./tests/test_main
+      - name: Build and run tests
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make
+          ./tests/test_main
