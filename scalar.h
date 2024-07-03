@@ -171,6 +171,8 @@ public:
         return result;
     }
 
+
+
     // dont allow inplace operations
     Scalar<T>& operator+=(const Scalar<T>& rhs) = delete;
     Scalar<T>& operator-=(const Scalar<T>& rhs) = delete;

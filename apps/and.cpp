@@ -1,14 +1,17 @@
 #include <iostream>
-#include "../backprop.h"
 #include <memory>
 #include <vector>
+#include "../backprop.h"
+
+// move operator
+#include <utility>
 
 
 int main(int argc, char** argv) {
     if (argc > 1 && std::string(argv[1]) == "debug") Logger::get_instance().set_debug_mode(true);
     else if (argc > 1) throw std::runtime_error("Invalid argument in main function. Use 'debug' to enable debug mode.");
 
-    int num_epochs = 10000, num_samples = 4;
+    int num_epochs = 500000, num_samples = 4;
     float learning_rate = 0.001;
 
     // weights shared pointer
@@ -39,26 +42,28 @@ int main(int argc, char** argv) {
         std::shared_ptr<Scalar<double>> loss = Scalar<double>::make(0);
         for (int j = 0; j < num_samples; j++) {
             auto z = Scalar<double>::make(0);
+            
             for (int k = 0; k < weights.size(); k++) {
-                if (k == 0) z = z + weights[k];
+                if (k == weights.size() - 1) z = z + weights[k];
                 else z = z + weights[k] * X[j][k];
             }
             auto a = sigmoid(z);
             loss = cross_entropy(Y[j], a) + loss;
         }
 
-        loss = loss / Scalar<double>::make(num_samples);
+        // loss = loss / Scalar<double>::make(num_samples);
         loss->backward();
         
         // update weights
-        for (int j = 0; j < weights.size(); j++) weights[j]->value -= learning_rate * weights[j]->grad; 
+        for (int j = 0; j < weights.size(); j++) {
+            weights[j]->value -= learning_rate * weights[j]->grad; 
+            weights[j]->grad = 0;
+        }
 
         if (i % 1000 == 0) Logger::get_instance().log(
             "Epoch: " + std::to_string(i) + "/Loss: " + std::to_string(loss->value),
             Logger::LogLevel::INFO
         );
-
-        break;
     }
 
     return 0;
