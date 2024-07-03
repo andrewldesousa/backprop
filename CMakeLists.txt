@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
 project(backprop)
 
+# use c++17
+set(CMAKE_CXX_STANDARD 17)
+
 # debug build by default
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
