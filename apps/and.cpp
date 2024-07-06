@@ -46,11 +46,11 @@ int main(int argc, char** argv) {
         for (int j = 0; j < num_samples; j++) {
             auto z = weights[0] * X[j][0] + weights[1] * X[j][1] + weights[2]; 
             auto a = sigmoid(z);
-            // loss = cross_entropy(Y[j], a) + loss;
+            loss = cross_entropy(Y[j], a) + loss;
         }
 
-        // loss = loss / Scalar<double>::make(num_samples);
-        // loss->backward();
+        loss = loss / Scalar<double>::make(num_samples);
+        loss->backward();
         
         // update weights
         for (int j = 0; j < weights.size(); j++) {
