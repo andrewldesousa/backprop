@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     else if (argc > 1) throw std::runtime_error("Invalid argument in main function. Use 'debug' to enable debug mode.");
 
     int num_epochs = 5000000, num_samples = 4;
-    float learning_rate = 0.001;
+    float learning_rate = 0.01;
 
     // weights shared pointer
     std::vector<std::shared_ptr<Scalar<double>>> weights{

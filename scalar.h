@@ -68,9 +68,18 @@ public:
         lhs->in_degrees++;
         rhs->in_degrees++;
 
-        result->_backward = [lhs, rhs, result]() {
-            lhs->grad += 1.0 * result->grad;
-            rhs->grad += 1.0 * result->grad;
+        result->_backward = [
+            lhs = std::weak_ptr<Scalar<T>>(lhs), 
+            rhs = std::weak_ptr<Scalar<T>>(rhs), 
+            result = std::weak_ptr<Scalar<T>>(result)]()
+        {
+            if (auto lhs_shared = lhs.lock(); lhs_shared) {
+                lhs_shared->grad += 1.0 * result.lock()->grad;
+            }
+
+            if (auto rhs_shared = rhs.lock(); rhs_shared) {
+                rhs_shared->grad += 1.0 * result.lock()->grad;
+            }
         };
 
         return result;
@@ -84,9 +93,18 @@ public:
         lhs->in_degrees++;
         rhs->in_degrees++;
 
-        result->_backward = [lhs, rhs, result]() {
-            lhs->grad += 1.0 * result->grad;
-            rhs->grad += -1.0 * result->grad;
+        result->_backward = [
+            lhs = std::weak_ptr<Scalar<T>>(lhs), 
+            rhs = std::weak_ptr<Scalar<T>>(rhs), 
+            result = std::weak_ptr<Scalar<T>>(result)]() 
+        {
+            if (auto lhs_shared = lhs.lock(); lhs_shared) {
+                lhs_shared->grad += 1.0 * result.lock()->grad;
+            }
+
+            if (auto rhs_shared = rhs.lock(); rhs_shared) {
+                rhs_shared->grad += -1.0 * result.lock()->grad;
+            }
         };
 
         return result;
@@ -100,9 +118,18 @@ public:
         lhs->in_degrees++;
         rhs->in_degrees++;
 
-        result->_backward = [lhs, rhs, result]() {
-            lhs->grad += rhs->value * result->grad;
-            rhs->grad += lhs->value * result->grad;
+        result->_backward = [
+            lhs = std::weak_ptr<Scalar<T>>(lhs), 
+            rhs = std::weak_ptr<Scalar<T>>(rhs), 
+            result = std::weak_ptr<Scalar<T>>(result)]() 
+        {
+            
+            if (auto lhs_shared = lhs.lock(); lhs_shared) {
+                lhs_shared->grad += rhs.lock()->value * result.lock()->grad;
+            }
+            if (auto rhs_shared = rhs.lock(); rhs_shared) {
+                rhs_shared->grad += lhs.lock()->value * result.lock()->grad;
+            }
         };
 
         return result;
@@ -116,9 +143,17 @@ public:
         lhs->in_degrees++;
         rhs->in_degrees++;
 
-        result->_backward = [lhs, rhs, result]() {
-            lhs->grad += 1.0 / rhs->value * result->grad;
-            rhs->grad += (-1.0 /(rhs->value * rhs->value)) * result->grad;
+        result->_backward = [
+            lhs = std::weak_ptr<Scalar<T>>(lhs),
+            rhs = std::weak_ptr<Scalar<T>>(rhs),
+            result = std::weak_ptr<Scalar<T>>(result)]()
+        {
+            if (auto lhs_shared = lhs.lock(); lhs_shared) {
+                lhs_shared->grad += 1.0 / rhs.lock()->value * result.lock()->grad;
+            }
+            if (auto rhs_shared = rhs.lock(); rhs_shared) {
+                rhs_shared->grad += -lhs.lock()->value / (rhs.lock()->value * rhs.lock()->value) * result.lock()->grad;
+            }
         };
 
         return result;
@@ -131,8 +166,13 @@ public:
         result->children.insert(rhs);
         rhs->in_degrees++;
 
-        result->_backward = [rhs, result]() {
-            rhs->grad += -1.0 * result->grad;
+        result->_backward = [
+            rhs = std::weak_ptr<Scalar<T>>(rhs),
+            result = std::weak_ptr<Scalar<T>>(result)]()
+        {
+            if (auto rhs_shared = rhs.lock(); rhs_shared) {
+                rhs_shared->grad += -1.0 * result.lock()->grad;
+            }
         };
 
         return result;
@@ -148,8 +188,13 @@ public:
         result->children.insert(rhs);
         rhs->in_degrees++;
 
-        result->_backward = [rhs, result]() {
-            rhs->grad += std::exp(rhs->value) * result->grad;
+        result->_backward = [
+            rhs = std::weak_ptr<Scalar<T>>(rhs),
+            result = std::weak_ptr<Scalar<T>>(result)]()
+        {
+            if (auto rhs_shared = rhs.lock(); rhs_shared) {
+                rhs_shared->grad += std::exp(rhs_shared->value) * result.lock()->grad;
+            }
         };
 
         return result;
@@ -162,8 +207,13 @@ public:
         result->children.insert(rhs);
         rhs->in_degrees++;
 
-        result->_backward = [rhs, result]() {
-            rhs->grad += 1.0 / rhs->value * result->grad;
+        result->_backward = [
+            rhs = std::weak_ptr<Scalar<T>>(rhs),
+            result = std::weak_ptr<Scalar<T>>(result)]()
+        {
+            if (auto rhs_shared = rhs.lock(); rhs_shared) {
+                rhs_shared->grad += 1.0 / rhs_shared->value * result.lock()->grad;
+            }
         };
 
         return result;
@@ -175,8 +225,13 @@ public:
         result->children.insert(rhs);
         rhs->in_degrees++;
 
-        result->_backward = [rhs, result]() {
-            rhs->grad += 2.0 * rhs->value * result->grad;
+        result->_backward = [
+            rhs = std::weak_ptr<Scalar<T>>(rhs),
+            result = std::weak_ptr<Scalar<T>>(result)]()
+        {
+            if (auto rhs_shared = rhs.lock(); rhs_shared) {
+                rhs_shared->grad += 2.0 * rhs_shared->value * result.lock()->grad;
+            }
         };
 
         return result;
